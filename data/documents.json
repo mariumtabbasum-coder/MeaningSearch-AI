@@ -1,0 +1,14 @@
+[
+{"text":"Python is a good language for beginners because its syntax is simple and readable.","category":"Programming"},
+{"text":"JavaScript is used to build interactive websites and runs in every web browser.","category":"Web Development"},
+{"text":"HTML structures the content of web pages using elements like headings, paragraphs and links.","category":"Frontend"},
+{"text":"CSS controls the layout, colors and spacing of web pages.","category":"Frontend"},
+{"text":"Machine learning helps computers learn patterns from data without being explicitly programmed.","category":"Artificial Intelligence"},
+{"text":"Embeddings turn text into numbers so that sentences with similar meaning end up close together.","category":"Artificial Intelligence"},
+{"text":"Cosine similarity measures the angle between two vectors to tell how similar their meanings are.","category":"Artificial Intelligence"},
+{"text":"Flask is a lightweight Python framework for building web applications and APIs.","category":"Backend"},
+{"text":"SQL databases store data in tables, and SQLite is a simple file-based database.","category":"Databases"},
+{"text":"Git tracks changes in your code, and GitHub lets you share and collaborate on repositories.","category":"Tools"},
+{"text":"Practice daily with small projects to learn programming faster than only watching tutorials.","category":"Learning"},
+{"text":"RAG retrieves relevant documents first and then asks an AI model to answer using them.","category":"Artificial Intelligence"}
+]
