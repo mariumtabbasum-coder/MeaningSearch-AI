@@ -5,7 +5,7 @@ from google.genai import types
 import db, services as S
 from config import CHAT_MODELS, EMBED_MODEL, GEMINI_API_KEY
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="public", static_url_path="")  # Vercel serves public/ from its CDN
 CORS(app)
 db.init()
 

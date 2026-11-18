@@ -2,8 +2,9 @@
 import json, time, ast, operator, datetime, numpy as np, requests
 from google import genai
 from google.genai import types
-from config import GEMINI_API_KEY, CHAT_MODELS, EMBED_MODEL
+from config import GEMINI_API_KEY, CHAT_MODELS, EMBED_MODEL, ON_VERCEL
 import db
+from concurrent.futures import ThreadPoolExecutor
 
 _client = None
 def client():
@@ -54,7 +55,25 @@ def _worker():
     finally:
         STATE["running"] = False
 
+def embed_pending_sync():
+    """Serverless-safe: embed missing documents inside the request (background threads are not reliable on Vercel)."""
+    rows = db.q("SELECT id,text FROM documents WHERE embedding IS NULL LIMIT 50")
+    if not rows: return 0
+    with ThreadPoolExecutor(max_workers=6) as ex:
+        vecs = list(ex.map(lambda r: _embed_one(r["text"]), rows))
+    for r, v in zip(rows, vecs):
+        db.run("UPDATE documents SET embedding=? WHERE id=?", (json.dumps(v), r["id"]))
+    return len(rows)
+
 def start_embedding(force=False):
+    if ON_VERCEL:
+        if force: db.run("UPDATE documents SET embedding=NULL")
+        STATE.update(running=False, error=None)
+        try:
+            n = embed_pending_sync(); STATE.update(done=n, total=n)
+        except Exception as e:
+            STATE["error"] = str(e)[:200]
+        return True
     """Embeds only documents that have no vector yet, in a background thread."""
     with _lock:
         if STATE["running"]: return False
@@ -64,6 +83,7 @@ def start_embedding(force=False):
     return True
 
 def search(query, k=5):
+    if ON_VERCEL: embed_pending_sync()
     qv = embed([query])[0]
     docs = db.q("SELECT id,text,category,embedding FROM documents WHERE embedding IS NOT NULL")
     res = [{"id": d["id"], "text": d["text"], "category": d["category"],
